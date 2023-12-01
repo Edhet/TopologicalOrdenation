@@ -2,6 +2,7 @@ import Demos.Constants;
 import Demos.EratosthenesSieveDemo;
 
 public class Main {
+
     public static void main(String[] args) {
         TimedExecution timedExecution = new TimedExecution();
 
