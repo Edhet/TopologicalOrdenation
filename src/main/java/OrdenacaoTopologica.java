@@ -92,13 +92,17 @@ public class OrdenacaoTopologica
 		return false;
 	}
 
-	public Elo smallerEloSearch()
+	public void print()
 	{
 		Elo p;
-		Elo q = null;
+		for(p = prim; p != null; p = p.prox)
+			System.out.println(p.chave);
+	}
 
-		p = prim;
-		prim = null;
+	public OrdenacaoTopologica smallerEloSearch(Elo novo, Elo fim, OrdenacaoTopologica lista)
+	{
+		Elo p = prim;
+		Elo q;
 
 		while(p != null)
 		{
@@ -106,48 +110,67 @@ public class OrdenacaoTopologica
 			p = q.prox;
 			if(q.contador == 0)
 			{
-				q.prox = prim;
-				prim = q;
+				if(lista.prim == null)
+				{
+					q.contador--;
+					novo = new Elo(q.chave, q.contador, null, q.listaSuc);
+					lista.prim = novo;
+				}
+				else
+				{
+					q.contador--;
+					novo = new Elo(q.chave, q.contador, null, q.listaSuc);
+					fim.prox = novo;
+				}
+
+				fim = novo;
 			}
 		}
-		return q;
+		return lista;
 	}
 
-	public void topologicalSort()
+	public void reduzSuc()
 	{
-		Elo q;
-		EloSuc aux;
+		Elo p = prim;
 
-		while(n > 0)
-		{
-			q = smallerEloSearch();
-
-			System.out.println(q.chave);
-			n--;
-			q.listaSuc.id.contador--;
-			if (q.listaSuc.id.contador == 0)
+		while(p != null) {
+			if(p.contador == -1)
 			{
-				q.prox = q.listaSuc.id;
-				q.listaSuc.id = q.listaSuc.prox.id;
+
+				while(p.listaSuc != null)
+				{
+					p.listaSuc.id.contador--;
+					p.listaSuc = p.listaSuc.prox;
+				}
+
 			}
-
-			aux = q.listaSuc.prox;
-			while(aux.prox != null) {
-				aux.id.contador--;
-				if (aux.id.contador == 0)
-					q.prox = aux.id;
-				aux.prox = aux.prox.prox;
-
-				aux = aux.prox;
-			}
-
+			p = p.prox;
 		}
+
 	}
 
-	public void print()
+	public OrdenacaoTopologica topologicalSort()
 	{
-		Elo p;
-		for(p = prim; p != null; p = p.prox)
-			System.out.println(p.chave);
+		OrdenacaoTopologica lista = new OrdenacaoTopologica();
+		Elo novo = prim;
+		Elo fim = null;
+		int n = 10;
+
+
+		return topologicalSort(lista, novo, fim, n);
+	}
+
+	public OrdenacaoTopologica topologicalSort(OrdenacaoTopologica lista, Elo novo, Elo fim, int n)
+	{
+		if(n <= 0)
+		{
+			return lista;
+		}
+		n--;
+
+		lista = smallerEloSearch(novo, fim, lista);
+		reduzSuc();
+
+		return topologicalSort(lista, novo, fim, n);
 	}
 }
