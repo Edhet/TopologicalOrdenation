@@ -139,7 +139,8 @@ public class OrdenacaoTopologica
 
 				while(p.listaSuc != null)
 				{
-					p.listaSuc.id.contador--;
+					if(p.listaSuc.id != null)
+						p.listaSuc.id.contador--;
 					p.listaSuc = p.listaSuc.prox;
 				}
 
@@ -147,6 +148,20 @@ public class OrdenacaoTopologica
 			p = p.prox;
 		}
 
+	}
+
+	public Elo retornaUlt(OrdenacaoTopologica lista)
+	{
+		Elo ult = null;
+		Elo p;
+		for(p = lista.prim; p != null; p = p.prox)
+		{
+			if(p.contador == -1)
+				ult = p;
+
+		}
+
+		return ult;
 	}
 
 	public OrdenacaoTopologica topologicalSort()
@@ -162,6 +177,7 @@ public class OrdenacaoTopologica
 
 	public OrdenacaoTopologica topologicalSort(OrdenacaoTopologica lista, Elo novo, Elo fim, int n)
 	{
+
 		if(n <= 0)
 		{
 			return lista;
@@ -170,6 +186,8 @@ public class OrdenacaoTopologica
 
 		lista = smallerEloSearch(novo, fim, lista);
 		reduzSuc();
+
+		fim = retornaUlt(lista);
 
 		return topologicalSort(lista, novo, fim, n);
 	}
