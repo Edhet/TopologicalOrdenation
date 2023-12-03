@@ -65,11 +65,11 @@ public class OrdenacaoTopologica
 	
 	/* Número de elementos na lista. */
 	private int n;
-		
-	public OrdenacaoTopologica()
+
+	public OrdenacaoTopologica(Elo prim, int n)
 	{
-		prim = null;
-		n = 0;
+		this.prim = prim;
+		this.n = n;
 	}
 	
 	/* Método responsável pela leitura do arquivo de entrada. */
@@ -140,9 +140,8 @@ public class OrdenacaoTopologica
 			{
 				while(p.listaSuc != null)
 				{
-					if(p.listaSuc.id != null) {
+					if(p.listaSuc.id != null)
 						p.listaSuc.id.contador--;
-						System.out.println("elo " + p.listaSuc.id.chave + "contador " + p.listaSuc.id.contador);}
 					p.listaSuc = p.listaSuc.prox;
 				}
 			}
@@ -166,10 +165,8 @@ public class OrdenacaoTopologica
 
 	public OrdenacaoTopologica topologicalSort()
 	{
-		OrdenacaoTopologica lista = new OrdenacaoTopologica();
+		OrdenacaoTopologica lista = new OrdenacaoTopologica(null, n);
 		Elo fim = null;
-		int n = 10;
-
 
 		return topologicalSort(lista, fim, n);
 	}
