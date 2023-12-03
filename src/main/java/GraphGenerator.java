@@ -42,9 +42,9 @@ public class GraphGenerator implements Runnable {
                     var target = adjacencyList[j];
                     target.contador++;
 
-                    createEdge(origin, new OrdenacaoTopologica.EloSuc(target, null));
+                    var lastEdge = createEdge(origin, new OrdenacaoTopologica.EloSuc(target, null));
                     if (hasTwoWayEdge(origin, target) || hasCycle(origin)) {
-                        undoLastEdge(origin);
+                        undoLastEdge(origin, lastEdge);
                         target.contador--;
                     }
                 }
@@ -94,10 +94,10 @@ public class GraphGenerator implements Runnable {
         return false;
     }
 
-    private void createEdge(OrdenacaoTopologica.Elo origin, OrdenacaoTopologica.EloSuc newEdge) {
+    private OrdenacaoTopologica.EloSuc createEdge(OrdenacaoTopologica.Elo origin, OrdenacaoTopologica.EloSuc newEdge) {
         if (origin.listaSuc == null) {
             origin.listaSuc = newEdge;
-            return;
+            return null;
         }
 
         var ptr = origin.listaSuc;
@@ -105,19 +105,15 @@ public class GraphGenerator implements Runnable {
             ptr = ptr.prox;
         }
         ptr.prox = newEdge;
+        return ptr;
     }
 
-    private void undoLastEdge(OrdenacaoTopologica.Elo node) {
-        if (node.listaSuc.prox == null) {
+    private void undoLastEdge(OrdenacaoTopologica.Elo node, OrdenacaoTopologica.EloSuc lastEdge) {
+        if (lastEdge == null) {
             node.listaSuc = null;
             return;
         }
-
-        OrdenacaoTopologica.EloSuc lastPtr = null;
-        for (var ptr = node.listaSuc; ptr.prox != null; ptr = ptr.prox) {
-            lastPtr = ptr;
-        }
-        lastPtr.prox = null;
+        lastEdge.prox = null;
     }
 
     private void populateAdjacencyList(OrdenacaoTopologica.Elo[] adjacencyList) {
