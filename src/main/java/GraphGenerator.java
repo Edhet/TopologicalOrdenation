@@ -61,19 +61,30 @@ public class GraphGenerator implements Runnable {
     }
 
     private boolean hasCycle(OrdenacaoTopologica.Elo node) {
-        return recHasCycle(node.chave, node.listaSuc);
+        var visited = new boolean[n];
+        var recStack = new boolean[n];
+
+        for (int i = 0; i < n; i++)
+            if (recHasCycle(node, visited, recStack))
+                return true;
+        return false;
     }
 
-    private boolean recHasCycle(int key, OrdenacaoTopologica.EloSuc sucNode) {
-        if (sucNode == null) return false;
-        if (sucNode.id.chave == key) return true;
+    private boolean recHasCycle(OrdenacaoTopologica.Elo node, boolean[] visited, boolean[] recStack) {
+        var key = node.chave;
 
-        for (var ptr = sucNode.prox; ptr != null; ptr = ptr.prox) {
-            if (recHasCycle(key, ptr))
+        if (recStack[key]) return true;
+        if (visited[key]) return false;
+
+        visited[key] = true;
+        recStack[key] = true;
+
+        for (var ptr = node.listaSuc; ptr != null; ptr = ptr.prox) {
+            if (recHasCycle(ptr.id, visited, recStack))
                 return true;
         }
-
-        return recHasCycle(key, sucNode.id.listaSuc);
+        recStack[key] = false;
+        return false;
     }
 
     private boolean hasTwoWayEdge(OrdenacaoTopologica.Elo origin, OrdenacaoTopologica.Elo target) {
