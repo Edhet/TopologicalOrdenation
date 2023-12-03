@@ -99,8 +99,10 @@ public class OrdenacaoTopologica
 			System.out.println(p.chave);
 	}
 
-	public OrdenacaoTopologica smallerEloSearch(Elo novo, Elo fim, OrdenacaoTopologica lista)
+	public OrdenacaoTopologica eloSearch(Elo lastElo, OrdenacaoTopologica list)
 	{
+		Elo newElo;
+
 		Elo p = prim;
 		Elo q;
 
@@ -110,72 +112,69 @@ public class OrdenacaoTopologica
 			p = q.prox;
 			if(q.contador == 0)
 			{
-				if(lista.prim == null)
+				if(list.prim == null)
 				{
 					q.contador--;
-					novo = new Elo(q.chave, q.contador, null, q.listaSuc);
-					lista.prim = novo;
+					newElo = new Elo(q.chave, q.contador, null, q.listaSuc);
+					list.prim = newElo;
 				}
 				else
 				{
 					q.contador--;
-					novo = new Elo(q.chave, q.contador, null, q.listaSuc);
-					fim.prox = novo;
+					newElo = new Elo(q.chave, q.contador, null, q.listaSuc);
+					lastElo.prox = newElo;
 				}
 
-				fim = novo;
+				lastElo = newElo;
 			}
 		}
-		return lista;
+		return list;
 	}
 
-	public void reduzSuc()
+	public void decreaseSucCont()
 	{
 		Elo p = prim;
 
 		while(p != null) {
 			if(p.contador == -1)
 			{
-
 				while(p.listaSuc != null)
 				{
-					if(p.listaSuc.id != null)
+					if(p.listaSuc.id != null) {
 						p.listaSuc.id.contador--;
+						System.out.println("elo " + p.listaSuc.id.chave + "contador " + p.listaSuc.id.contador);}
 					p.listaSuc = p.listaSuc.prox;
 				}
-
 			}
 			p = p.prox;
 		}
 
 	}
 
-	public Elo retornaUlt(OrdenacaoTopologica lista)
+	public Elo returnLastElo(OrdenacaoTopologica lista)
 	{
-		Elo ult = null;
+		Elo lastElo = null;
 		Elo p;
 		for(p = lista.prim; p != null; p = p.prox)
 		{
 			if(p.contador == -1)
-				ult = p;
+				lastElo = p;
 
 		}
-
-		return ult;
+		return lastElo;
 	}
 
 	public OrdenacaoTopologica topologicalSort()
 	{
 		OrdenacaoTopologica lista = new OrdenacaoTopologica();
-		Elo novo = prim;
 		Elo fim = null;
 		int n = 10;
 
 
-		return topologicalSort(lista, novo, fim, n);
+		return topologicalSort(lista, fim, n);
 	}
 
-	public OrdenacaoTopologica topologicalSort(OrdenacaoTopologica lista, Elo novo, Elo fim, int n)
+	public OrdenacaoTopologica topologicalSort(OrdenacaoTopologica lista, Elo fim, int n)
 	{
 
 		if(n <= 0)
@@ -184,11 +183,11 @@ public class OrdenacaoTopologica
 		}
 		n--;
 
-		lista = smallerEloSearch(novo, fim, lista);
-		reduzSuc();
+		lista = eloSearch(fim, lista);
+		decreaseSucCont();
 
-		fim = retornaUlt(lista);
+		fim = returnLastElo(lista);
 
-		return topologicalSort(lista, novo, fim, n);
+		return topologicalSort(lista, fim, n);
 	}
 }
