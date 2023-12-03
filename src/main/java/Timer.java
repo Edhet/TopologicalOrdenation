@@ -4,6 +4,9 @@ import java.util.List;
 public class Timer {
     private final String identifier;
     private long start, end;
+
+    private final List<Long> executionTimes = new ArrayList<>();
+
     private String parsedTime;
 
     public Timer(String identifier) {
@@ -15,16 +18,26 @@ public class Timer {
     }
 
     public void end() {
-        if (start == 0) return;
+        if (start == 0)
+            return;
         end = System.nanoTime();
-        parseNanoSeconds(end - start);
+        var time = end - start;
+        executionTimes.add(time);
+        parsedTime = parseNanoSeconds(time);
     }
 
-    public String getParsedTime() {
-        return parsedTime;
+    public String getAverageTime() {
+        long sum = 0;
+        for (var time : executionTimes)
+            sum += time;
+        return "[INFO ]: " + identifier + " average time: " + parseNanoSeconds((sum / executionTimes.size()));
     }
 
-    private void parseNanoSeconds(long executionTimeInNanos) {
+    public String getTime() {
+        return "[INFO ]: " + identifier + " time: " + parsedTime;
+    }
+
+    private String parseNanoSeconds(long executionTimeInNanos) {
         List<String> timeOrder = new ArrayList<>();
 
         if (executionTimeInNanos / (3600L * 1_000_000_000) > 0) {
@@ -48,7 +61,7 @@ public class Timer {
         }
 
         if (timeOrder.isEmpty())
-            parsedTime = "[INFO ]: " + identifier + " execution time: < ms";
+            return "< ms";
 
         StringBuilder stringBuilder = new StringBuilder();
         int i = 0;
@@ -57,6 +70,6 @@ public class Timer {
             stringBuilder.append(order);
             i++;
         }
-        parsedTime = "[INFO ]: " + identifier + " execution time: " + stringBuilder.toString();
+        return stringBuilder.toString();
     }
 }

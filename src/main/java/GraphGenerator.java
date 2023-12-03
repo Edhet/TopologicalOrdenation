@@ -1,9 +1,11 @@
 public class GraphGenerator implements Runnable {
     private final int n;
     private final double p;
-    private final boolean debug;
 
     private OrdenacaoTopologica.Elo result;
+
+    private final boolean debug;
+    private float generationPercentage = -1.0f;
 
     public GraphGenerator(int n, double p, boolean debug) {
         this.debug = debug;
@@ -29,6 +31,16 @@ public class GraphGenerator implements Runnable {
         System.out.println("}");
     }
 
+    private void showGenerationProgress(int i) {
+        if (!debug) return;
+
+        float percentage = ((float) (i +1) / n) * 100;
+        if (percentage > generationPercentage + 1.0f) {
+            generationPercentage = percentage;
+            System.out.printf("[DEBUG]: Generation %.0f%% done\n", generationPercentage);
+        }
+    }
+
     @Override
     public void run() {
         var adjacencyList = new OrdenacaoTopologica.Elo[n];
@@ -49,12 +61,7 @@ public class GraphGenerator implements Runnable {
                     }
                 }
             }
-
-            float percentage = ((float) (i+1) / n) * 100;
-            if (percentage > lastPercentage + 1.0f) {
-                lastPercentage = percentage;
-                System.out.printf("[INFO ]: Generation %.0f%% done\n", lastPercentage);
-            }
+            showGenerationProgress(i);
         }
         result = adjacencyList[0];
         debug();
