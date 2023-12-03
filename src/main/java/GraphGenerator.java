@@ -1,10 +1,12 @@
 public class GraphGenerator implements Runnable {
     private final int n;
     private final double p;
+    private final boolean debug;
 
     private OrdenacaoTopologica.Elo result;
 
-    public GraphGenerator(int n, double p) {
+    public GraphGenerator(int n, double p, boolean debug) {
+        this.debug = debug;
         this.n = n;
         this.p = p;
     }
@@ -14,6 +16,9 @@ public class GraphGenerator implements Runnable {
     }
 
     public void debug() {
+        if (!debug) return;
+
+        System.out.println("[DEBUG]: Generated Graph {");
         for (var ptr = result; ptr != null; ptr = ptr.prox) {
             System.out.print("Node: " + ptr.chave + " Predecessors: " + ptr.contador + " Sucessors: ");
             for (var sucPtr = ptr.listaSuc; sucPtr != null; sucPtr = sucPtr.prox) {
@@ -21,6 +26,7 @@ public class GraphGenerator implements Runnable {
             }
             System.out.println();
         }
+        System.out.println("}");
     }
 
     @Override
@@ -28,39 +34,46 @@ public class GraphGenerator implements Runnable {
         var adjacencyList = new OrdenacaoTopologica.Elo[n];
         populateAdjacencyList(adjacencyList);
 
+        var lastPercentage = -1.0;
         for (int i = 0; i < n; i++) {
             var origin = adjacencyList[i];
-            for (int j = 0; j < n; j++) {
+            for (int j = 1; j < n; j++) {
                 if (j != i && Math.random() < p) {
                     var target = adjacencyList[j];
                     target.contador++;
 
                     createEdge(origin, new OrdenacaoTopologica.EloSuc(target, null));
-                    if (hasTwoWayEdge(origin, target) || isCiclical(origin)) {
+                    if (hasTwoWayEdge(origin, target) || hasCycle(origin)) {
                         undoLastEdge(origin);
                         target.contador--;
                     }
                 }
+            }
+
+            float percentage = ((float) (i+1) / n) * 100;
+            if (percentage > lastPercentage + 1.0f) {
+                lastPercentage = percentage;
+                System.out.printf("[INFO ]: Generation %.0f%% done\n", lastPercentage);
             }
         }
         result = adjacencyList[0];
         debug();
     }
 
-    private boolean isCiclical(OrdenacaoTopologica.Elo node) {
-        return recIsCiclicalImpl(node.chave, node.listaSuc);
+    private boolean hasCycle(OrdenacaoTopologica.Elo node) {
+        return recHasCycle(node.chave, node.listaSuc);
     }
 
-     private boolean recIsCiclicalImpl(int key, OrdenacaoTopologica.EloSuc sucessorNode) {
-        if (sucessorNode == null) return false;
-        if (sucessorNode.id.chave == key) return true;
+    private boolean recHasCycle(int key, OrdenacaoTopologica.EloSuc sucNode) {
+        if (sucNode == null) return false;
+        if (sucNode.id.chave == key) return true;
 
-        for (var ptr = sucessorNode; ptr.prox != null; ptr = ptr.prox) {
-            if (recIsCiclicalImpl(key, ptr.id.listaSuc))
+        for (var ptr = sucNode.prox; ptr != null; ptr = ptr.prox) {
+            if (recHasCycle(key, ptr))
                 return true;
         }
 
-        return recIsCiclicalImpl(key, sucessorNode.prox);
+        return recHasCycle(key, sucNode.id.listaSuc);
     }
 
     private boolean hasTwoWayEdge(OrdenacaoTopologica.Elo origin, OrdenacaoTopologica.Elo target) {
