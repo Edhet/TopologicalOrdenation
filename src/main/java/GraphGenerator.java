@@ -64,10 +64,7 @@ public class GraphGenerator implements Runnable {
         var visited = new boolean[n];
         var recStack = new boolean[n];
 
-        for (int i = 0; i < n; i++)
-            if (recHasCycle(node, visited, recStack))
-                return true;
-        return false;
+        return recHasCycle(node, visited, recStack);
     }
 
     private boolean recHasCycle(OrdenacaoTopologica.Elo node, boolean[] visited, boolean[] recStack) {
