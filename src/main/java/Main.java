@@ -24,10 +24,10 @@ public class Main {
 			GraphGenerator gg = new GraphGenerator(1000, 0.2, true);
 			OrdenacaoTopologica list;
 			te.start();
+			gg.run();
 			OrdenacaoTopologica ord = new OrdenacaoTopologica(gg.getResult(), 1000);
 			list = ord.topologicalSort();
 			list.print();
-			gg.run();
 			te.end();
 			System.out.println(te.getTime());
 		}
