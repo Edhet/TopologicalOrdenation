@@ -2,16 +2,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Timer {
-    private final String identifier;
     private long start, end;
 
-    private final List<Long> executionTimes = new ArrayList<>();
+    private List<Long> executionTimes = new ArrayList<>();
 
     private String parsedTime;
 
-    public Timer(String identifier) {
-        this.identifier = identifier;
-    }
+    public Timer() { }
 
     public void start() {
         start = System.nanoTime();
@@ -26,15 +23,19 @@ public class Timer {
         parsedTime = parseNanoSeconds(time);
     }
 
+    public void resetAverage() {
+        executionTimes = new ArrayList<>();
+    }
+
     public String getAverageTime() {
         long sum = 0;
         for (var time : executionTimes)
             sum += time;
-        return "[INFO ]: " + identifier + " average time: " + parseNanoSeconds((sum / executionTimes.size()));
+        return parseNanoSeconds((sum / executionTimes.size()));
     }
 
     public String getTime() {
-        return "[INFO ]: " + identifier + " time: " + parsedTime;
+        return parsedTime;
     }
 
     private String parseNanoSeconds(long executionTimeInNanos) {
@@ -61,7 +62,7 @@ public class Timer {
         }
 
         if (timeOrder.isEmpty())
-            return "< ms";
+            return "less than a ms";
 
         StringBuilder stringBuilder = new StringBuilder();
         int i = 0;

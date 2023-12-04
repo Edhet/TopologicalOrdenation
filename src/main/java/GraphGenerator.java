@@ -4,11 +4,12 @@ public class GraphGenerator implements Runnable {
 
     private OrdenacaoTopologica.Elo result;
 
-    private final boolean debug;
+    private final boolean debug, progress;
     private float generationPercentage = -1.0f;
 
-    public GraphGenerator(int n, double p, boolean debug) {
+    public GraphGenerator(int n, double p, boolean debug, boolean progress) {
         this.debug = debug;
+        this.progress = progress;
         this.n = n;
         this.p = p;
     }
@@ -32,7 +33,7 @@ public class GraphGenerator implements Runnable {
     }
 
     private void showGenerationProgress(int i) {
-        if (!debug) return;
+        if (!progress) return;
 
         float percentage = ((float) (i +1) / n) * 100;
         if (percentage > generationPercentage + 1.0f) {
