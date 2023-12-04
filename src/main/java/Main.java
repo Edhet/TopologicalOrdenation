@@ -22,7 +22,11 @@ public class Main {
 		Timer te = new Timer("Graph generation");
 		for (int i = 0; i < 10; i++) {
 			GraphGenerator gg = new GraphGenerator(1000, 0.2, true);
+			OrdenacaoTopologica list;
 			te.start();
+			OrdenacaoTopologica ord = new OrdenacaoTopologica(gg.getResult(), 1000);
+			list = ord.topologicalSort();
+			list.print();
 			gg.run();
 			te.end();
 			System.out.println(te.getTime());
