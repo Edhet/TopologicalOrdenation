@@ -12,6 +12,7 @@ public class Main {
 				FileOutputStream fos = new FileOutputStream(log);
 				PrintStream ps = new PrintStream(fos);
 				System.setOut(ps);
+				System.setErr(ps);
 			} catch (FileNotFoundException e) {
 				System.out.println("[ERROR]: The log file could not be opened.");
 			}
