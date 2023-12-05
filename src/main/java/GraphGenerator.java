@@ -1,15 +1,12 @@
 public class GraphGenerator implements Runnable {
     private final int n;
     private final double p;
-
     private OrdenacaoTopologica.Elo result;
 
-    private final boolean debug, progress;
-    private float generationPercentage = -1.0f;
+    private final boolean debug;
 
-    public GraphGenerator(int n, double p, boolean debug, boolean progress) {
+    public GraphGenerator(int n, double p, boolean debug) {
         this.debug = debug;
-        this.progress = progress;
         this.n = n;
         this.p = p;
     }
@@ -32,71 +29,55 @@ public class GraphGenerator implements Runnable {
         System.out.println("}");
     }
 
-    private void showGenerationProgress(int i) {
-        if (!progress) return;
-
-        float percentage = ((float) (i +1) / n) * 100;
-        if (percentage > generationPercentage + 1.0f) {
-            generationPercentage = percentage;
-            System.out.printf("[DEBUG]: Generation %.0f%% done.\n", generationPercentage);
-        }
-    }
-
     @Override
     public void run() {
         var adjacencyList = new OrdenacaoTopologica.Elo[n];
         populateAdjacencyList(adjacencyList);
 
-        var lastPercentage = -1.0;
         for (int i = 0; i < n; i++) {
             var origin = adjacencyList[i];
             for (int j = 1; j < n; j++) {
                 if (j != i && Math.random() < p) {
                     var target = adjacencyList[j];
                     target.contador++;
-
                     createEdge(origin, new OrdenacaoTopologica.EloSuc(target, null));
                 }
             }
-
-            var visited = new boolean[n];
-            for (int j = 1; j < n; j++) {
-                removeCycles(adjacencyList[j], visited);
-            }
-            showGenerationProgress(i);
         }
+        removeCycles(adjacencyList);
+
         result = adjacencyList[0];
         debug();
     }
 
-    private void removeCycles(OrdenacaoTopologica.Elo node, boolean[] visited) {
-        var recStack = new boolean[n];
-        recRemoveCycles(node, visited, recStack, null);
+    private void removeCycles(OrdenacaoTopologica.Elo[] adjacencyList) {
+        var visited = new boolean[n];
+        var stack = new boolean[n];
+
+        for (int j = 0; j < n; j++) {
+            if (!visited[j])
+                dfs(adjacencyList[j], visited, stack);
+        }
     }
 
-    private boolean recRemoveCycles(OrdenacaoTopologica.Elo node, boolean[] visited, boolean[] recStack, OrdenacaoTopologica.Elo lastNode) {
-        var key = node.chave;
-
-        if (recStack[key]) return true;
-        if (visited[key]) return false;
-
-        visited[key] = true;
-        recStack[key] = true;
+    private void dfs(OrdenacaoTopologica.Elo node, boolean[] visited, boolean[] stack) {
+        visited[node.chave] = true;
+        stack[node.chave] = true;
 
         for (var ptr = node.listaSuc; ptr != null; ptr = ptr.prox) {
-            if (recRemoveCycles(ptr.id, visited, recStack, node)) {
-                removeEdge(lastNode, ptr.id.chave);
-                return true;
+            if (!visited[ptr.id.chave])
+                dfs(ptr.id, visited, stack);
+            else if (stack[ptr.id.chave]) {
+                removeEdge(node, ptr.id.chave);
             }
         }
-        recStack[key] = false;
-        return false;
+        stack[node.chave] = false;
     }
 
-    private OrdenacaoTopologica.EloSuc createEdge(OrdenacaoTopologica.Elo origin, OrdenacaoTopologica.EloSuc newEdge) {
+    private void createEdge(OrdenacaoTopologica.Elo origin, OrdenacaoTopologica.EloSuc newEdge) {
         if (origin.listaSuc == null) {
             origin.listaSuc = newEdge;
-            return null;
+            return;
         }
 
         var ptr = origin.listaSuc;
@@ -104,26 +85,32 @@ public class GraphGenerator implements Runnable {
             ptr = ptr.prox;
         }
         ptr.prox = newEdge;
-        return ptr;
     }
-
     private void removeEdge(OrdenacaoTopologica.Elo node, int key) {
         if (node == null || node.listaSuc == null) return;
 
         OrdenacaoTopologica.EloSuc lastPtr = null;
-        for (var ptr = node.listaSuc; ptr.prox != null; ptr = ptr.prox) {
-            if (ptr.id.chave == key) break;
+        OrdenacaoTopologica.EloSuc toRemove = null;
+
+        for (var ptr = node.listaSuc; ptr != null; ptr = ptr.prox) {
+            if (ptr.id.chave == key) {
+                toRemove = ptr;
+                break;
+            }
             lastPtr = ptr;
         }
-        if (lastPtr != null) {
-            lastPtr.prox.id.contador--;
-            lastPtr.prox = null;
-        }
-        else {
-            node.listaSuc.id.contador--;
-            node.listaSuc = null;
+
+        if (toRemove != null) {
+            if (lastPtr != null) {
+                lastPtr.prox = toRemove.prox;
+            } else {
+                node.listaSuc = toRemove.prox;
+            }
+
+            toRemove.id.contador--;
         }
     }
+
 
     private void populateAdjacencyList(OrdenacaoTopologica.Elo[] adjacencyList) {
         for (int i = 0; i < n; i++) {
