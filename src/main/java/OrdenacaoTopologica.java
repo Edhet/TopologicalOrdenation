@@ -88,7 +88,7 @@ public class OrdenacaoTopologica
 	public boolean executa()
 	{
 		/* Preencher. */
-		
+		topologicalSort();
 		return false;
 	}
 

@@ -56,7 +56,7 @@ public class GraphGenerator implements Runnable {
                     target.contador++;
 
                     var lastEdge = createEdge(origin, new OrdenacaoTopologica.EloSuc(target, null));
-                    if (hasTwoWayEdge(origin, target) || hasCycle(origin)) {
+                    if (hasCycle(lastEdge == null ? origin.listaSuc : lastEdge.prox)) {
                         undoLastEdge(origin, lastEdge);
                         target.contador--;
                     }
@@ -68,11 +68,11 @@ public class GraphGenerator implements Runnable {
         debug();
     }
 
-    private boolean hasCycle(OrdenacaoTopologica.Elo node) {
+    private boolean hasCycle(OrdenacaoTopologica.EloSuc node) {
         var visited = new boolean[n];
         var recStack = new boolean[n];
 
-        return recHasCycle(node, visited, recStack);
+        return recHasCycle(node.id, visited, recStack);
     }
 
     private boolean recHasCycle(OrdenacaoTopologica.Elo node, boolean[] visited, boolean[] recStack) {
@@ -89,16 +89,6 @@ public class GraphGenerator implements Runnable {
                 return true;
         }
         recStack[key] = false;
-        return false;
-    }
-
-    private boolean hasTwoWayEdge(OrdenacaoTopologica.Elo origin, OrdenacaoTopologica.Elo target) {
-        if (target.listaSuc == null) return false;
-
-        for (var ptr = target.listaSuc; ptr != null; ptr = ptr.prox) {
-            if (ptr.id.chave == origin.chave) return true;
-        }
-
         return false;
     }
 
