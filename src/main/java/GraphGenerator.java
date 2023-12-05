@@ -55,12 +55,11 @@ public class GraphGenerator implements Runnable {
                     var target = adjacencyList[j];
                     target.contador++;
 
-                    var lastEdge = createEdge(origin, new OrdenacaoTopologica.EloSuc(target, null));
-                    if (hasCycle(lastEdge == null ? origin.listaSuc : lastEdge.prox)) {
-                        undoLastEdge(origin, lastEdge);
-                        target.contador--;
-                    }
+                    createEdge(origin, new OrdenacaoTopologica.EloSuc(target, null));
                 }
+            }
+            for (int j = 1; j < n; j++) {
+                removeCycles(adjacencyList[j]);
             }
             showGenerationProgress(i);
         }
@@ -68,14 +67,13 @@ public class GraphGenerator implements Runnable {
         debug();
     }
 
-    private boolean hasCycle(OrdenacaoTopologica.EloSuc node) {
+    private void removeCycles(OrdenacaoTopologica.Elo node) {
         var visited = new boolean[n];
         var recStack = new boolean[n];
-
-        return recHasCycle(node.id, visited, recStack);
+        recRemoveCycles(node, visited, recStack, null);
     }
 
-    private boolean recHasCycle(OrdenacaoTopologica.Elo node, boolean[] visited, boolean[] recStack) {
+    private boolean recRemoveCycles(OrdenacaoTopologica.Elo node, boolean[] visited, boolean[] recStack, OrdenacaoTopologica.Elo lastNode) {
         var key = node.chave;
 
         if (recStack[key]) return true;
@@ -85,8 +83,10 @@ public class GraphGenerator implements Runnable {
         recStack[key] = true;
 
         for (var ptr = node.listaSuc; ptr != null; ptr = ptr.prox) {
-            if (recHasCycle(ptr.id, visited, recStack))
+            if (recRemoveCycles(ptr.id, visited, recStack, node)) {
+                removeEdge(lastNode, ptr.id.chave);
                 return true;
+            }
         }
         recStack[key] = false;
         return false;
@@ -106,12 +106,22 @@ public class GraphGenerator implements Runnable {
         return ptr;
     }
 
-    private void undoLastEdge(OrdenacaoTopologica.Elo node, OrdenacaoTopologica.EloSuc lastEdge) {
-        if (lastEdge == null) {
-            node.listaSuc = null;
-            return;
+    private void removeEdge(OrdenacaoTopologica.Elo node, int key) {
+        if (node == null || node.listaSuc == null) return;
+
+        OrdenacaoTopologica.EloSuc lastPtr = null;
+        for (var ptr = node.listaSuc; ptr.prox != null; ptr = ptr.prox) {
+            if (ptr.id.chave == key) break;
+            lastPtr = ptr;
         }
-        lastEdge.prox = null;
+        if (lastPtr != null) {
+            lastPtr.prox.id.contador--;
+            lastPtr.prox = null;
+        }
+        else {
+            node.listaSuc.id.contador--;
+            node.listaSuc = null;
+        }
     }
 
     private void populateAdjacencyList(OrdenacaoTopologica.Elo[] adjacencyList) {

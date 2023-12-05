@@ -8,7 +8,7 @@ public class Main {
     private static final int MAX_ITERATIONS = 1;
     private static final double EDGE_CHANCE = 0.2;
 //    private static final int[] GRAPH_SIZES = {10, 20, 30, 50, 100, 200, 500, 1_000, 5_000, 10_000, 20_000, 30_000, 50_000, 100_000};
-    private static final int[] GRAPH_SIZES = {50000};
+    private static final int[] GRAPH_SIZES = {10_000};
 
     public static void main(String[] args) {
         if (false) {
