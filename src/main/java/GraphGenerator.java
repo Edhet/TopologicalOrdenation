@@ -38,7 +38,7 @@ public class GraphGenerator implements Runnable {
         float percentage = ((float) (i +1) / n) * 100;
         if (percentage > generationPercentage + 1.0f) {
             generationPercentage = percentage;
-            System.out.printf("[DEBUG]: Generation %.0f%% done\n", generationPercentage);
+            System.out.printf("[DEBUG]: Generation %.0f%% done.\n", generationPercentage);
         }
     }
 
@@ -58,8 +58,10 @@ public class GraphGenerator implements Runnable {
                     createEdge(origin, new OrdenacaoTopologica.EloSuc(target, null));
                 }
             }
+
+            var visited = new boolean[n];
             for (int j = 1; j < n; j++) {
-                removeCycles(adjacencyList[j]);
+                removeCycles(adjacencyList[j], visited);
             }
             showGenerationProgress(i);
         }
@@ -67,8 +69,7 @@ public class GraphGenerator implements Runnable {
         debug();
     }
 
-    private void removeCycles(OrdenacaoTopologica.Elo node) {
-        var visited = new boolean[n];
+    private void removeCycles(OrdenacaoTopologica.Elo node, boolean[] visited) {
         var recStack = new boolean[n];
         recRemoveCycles(node, visited, recStack, null);
     }

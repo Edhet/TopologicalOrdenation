@@ -33,7 +33,7 @@ public class Main {
 
                 System.out.println("[INFO ]: Generation started");
                 generationTimer.start();
-                GraphGenerator generator = new GraphGenerator(size, EDGE_CHANCE, true, true);
+                GraphGenerator generator = new GraphGenerator(size, EDGE_CHANCE, false, true);
                 generator.run();
                 generationTimer.end();
 
