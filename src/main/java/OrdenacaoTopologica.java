@@ -1,6 +1,7 @@
 
 public class OrdenacaoTopologica
 {
+	private final boolean debug;
 
 	public static class Elo
 	{
@@ -66,8 +67,9 @@ public class OrdenacaoTopologica
 	/* Número de elementos na lista. */
 	private int n;
 
-	public OrdenacaoTopologica(Elo prim, int n)
+	public OrdenacaoTopologica(Elo prim, int n, boolean debug)
 	{
+		this.debug = debug;
 		this.prim = prim;
 		this.n = n;
 	}
@@ -81,12 +83,13 @@ public class OrdenacaoTopologica
 	/* Método para impressão do estado atual da estrutura de dados. */
 	private void debug()
 	{
+		if (!debug) return;
 		Elo p;
 
-		System.out.println("[DEBUG]: Sorted List {");
+		System.out.print("[DEBUG]: Sorted List: { ");
 		for(p = prim; p != null; p = p.prox)
-			System.out.println(p.chave);
-		System.out.println("}");
+			System.out.print(p.chave + (p.prox == null ? "" : ", "));
+		System.out.println(" }");
 	}
 	
 	/* Método responsável por executar o algoritmo. */
@@ -164,7 +167,7 @@ public class OrdenacaoTopologica
 
 	public OrdenacaoTopologica topologicalSort()
 	{
-		OrdenacaoTopologica list = new OrdenacaoTopologica(null, n);
+		OrdenacaoTopologica list = new OrdenacaoTopologica(null, n, false);
 		Elo fim = null;
 
 		return topologicalSort(list, fim, n);
