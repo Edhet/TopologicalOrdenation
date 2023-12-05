@@ -81,28 +81,29 @@ public class OrdenacaoTopologica
 	/* Método para impressão do estado atual da estrutura de dados. */
 	private void debug()
 	{
-		/* Preencher. */
+		Elo p;
+
+		System.out.println("[DEBUG]: Sorted List {");
+		for(p = prim; p != null; p = p.prox)
+			System.out.println(p.chave);
+		System.out.println("}");
 	}
 	
 	/* Método responsável por executar o algoritmo. */
 	public boolean executa()
 	{
-		/* Preencher. */
-		topologicalSort();
-		return false;
-	}
+		OrdenacaoTopologica sortedList;
+		sortedList = topologicalSort();
+		prim = sortedList.prim;
 
-	public void print()
-	{
-		Elo p;
-		for(p = prim; p != null; p = p.prox)
-			System.out.println(p.chave);
+		debug();
+		
+		return true;
 	}
 
 	public OrdenacaoTopologica eloSearch(Elo lastElo, OrdenacaoTopologica list)
 	{
 		Elo newElo;
-
 		Elo p = prim;
 		Elo q;
 
@@ -147,44 +148,40 @@ public class OrdenacaoTopologica
 			}
 			p = p.prox;
 		}
-
 	}
 
-	public Elo returnLastElo(OrdenacaoTopologica lista)
+	public Elo returnLastElo(OrdenacaoTopologica list)
 	{
 		Elo lastElo = null;
 		Elo p;
-		for(p = lista.prim; p != null; p = p.prox)
+		for(p = list.prim; p != null; p = p.prox)
 		{
 			if(p.contador == -1)
 				lastElo = p;
-
 		}
 		return lastElo;
 	}
 
 	public OrdenacaoTopologica topologicalSort()
 	{
-		OrdenacaoTopologica lista = new OrdenacaoTopologica(null, n);
+		OrdenacaoTopologica list = new OrdenacaoTopologica(null, n);
 		Elo fim = null;
 
-		return topologicalSort(lista, fim, n);
+		return topologicalSort(list, fim, n);
 	}
 
-	public OrdenacaoTopologica topologicalSort(OrdenacaoTopologica lista, Elo fim, int n)
+	public OrdenacaoTopologica topologicalSort(OrdenacaoTopologica list, Elo fim, int n)
 	{
-
 		if(n <= 0)
 		{
-			return lista;
+			return list;
 		}
 		n--;
 
-		lista = eloSearch(fim, lista);
+		list = eloSearch(fim, list);
 		decreaseSucCont();
+		fim = returnLastElo(list);
 
-		fim = returnLastElo(lista);
-
-		return topologicalSort(lista, fim, n);
+		return topologicalSort(list, fim, n);
 	}
 }
