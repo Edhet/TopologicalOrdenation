@@ -75,40 +75,28 @@ public class GraphGenerator implements Runnable {
     }
 
     private void createEdge(OrdenacaoTopologica.Elo origin, OrdenacaoTopologica.EloSuc newEdge) {
-        if (origin.listaSuc == null) {
-            origin.listaSuc = newEdge;
-            return;
-        }
-
-        var ptr = origin.listaSuc;
-        while (ptr.prox != null) {
-            ptr = ptr.prox;
-        }
-        ptr.prox = newEdge;
+        if (origin.listaSuc != null)
+            newEdge.prox = origin.listaSuc;
+        origin.listaSuc = newEdge;
     }
+
     private void removeEdge(OrdenacaoTopologica.Elo node, int key) {
         if (node == null || node.listaSuc == null) return;
 
         OrdenacaoTopologica.EloSuc lastPtr = null;
-        OrdenacaoTopologica.EloSuc toRemove = null;
+        OrdenacaoTopologica.EloSuc toRemove = node.listaSuc;
 
-        for (var ptr = node.listaSuc; ptr != null; ptr = ptr.prox) {
-            if (ptr.id.chave == key) {
-                toRemove = ptr;
-                break;
-            }
-            lastPtr = ptr;
+        while(toRemove != null) {
+            if (toRemove.id.chave == key) break;
+            lastPtr = toRemove;
+            toRemove = toRemove.prox;
         }
 
-        if (toRemove != null) {
-            if (lastPtr != null) {
-                lastPtr.prox = toRemove.prox;
-            } else {
-                node.listaSuc = toRemove.prox;
-            }
+        if (toRemove == null) return;
 
-            toRemove.id.contador--;
-        }
+        if (lastPtr != null) lastPtr.prox = toRemove.prox;
+        else node.listaSuc = toRemove.prox;
+        toRemove.id.contador--;
     }
 
 
