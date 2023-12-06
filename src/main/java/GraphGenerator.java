@@ -40,7 +40,7 @@ public class GraphGenerator implements Runnable {
                 if (j != i && Math.random() < p) {
                     var target = adjacencyList[j];
                     target.contador++;
-                    createEdge(origin, new OrdenacaoTopologica.EloSuc(target, null));
+                    origin.listaSuc = new OrdenacaoTopologica.EloSuc(target, origin.listaSuc);
                 }
             }
         }
@@ -72,12 +72,6 @@ public class GraphGenerator implements Runnable {
             }
         }
         stack[node.chave] = false;
-    }
-
-    private void createEdge(OrdenacaoTopologica.Elo origin, OrdenacaoTopologica.EloSuc newEdge) {
-        if (origin.listaSuc != null)
-            newEdge.prox = origin.listaSuc;
-        origin.listaSuc = newEdge;
     }
 
     private void removeEdge(OrdenacaoTopologica.Elo node, int key) {
