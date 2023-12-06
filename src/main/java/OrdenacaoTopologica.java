@@ -1,3 +1,7 @@
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+
 
 public class OrdenacaoTopologica
 {
@@ -75,11 +79,55 @@ public class OrdenacaoTopologica
 	}
 	
 	/* Método responsável pela leitura do arquivo de entrada. */
-	public void realizaLeitura(String nomeEntrada)
-	{
-		/* Preencher. */
-	}
-	
+	 public void realizaLeitura(String nomeEntrada) {
+        try (BufferedReader br = new BufferedReader(new FileReader(nomeEntrada))) {
+            String linha;
+            
+            while ((linha = br.readLine()) != null) {
+
+                String[] tokens = linha.split(" < ");
+                
+                int x = Integer.parseInt(tokens[0]);
+                int y = Integer.parseInt(tokens[1]);
+                
+                Elo verticeX = encontrarOuCriarVertice(x);
+                Elo verticeY = encontrarOuCriarVertice(y);
+
+                if (prim == null) prim = verticeY;
+
+                if (verticeX.listaSuc == null) {
+                    verticeX.listaSuc = new EloSuc(verticeY, null);
+                } else {
+                    verticeX.listaSuc = new EloSuc(verticeY, verticeX.listaSuc);
+                }
+                verticeY.contador++;
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+    
+    private Elo encontrarOuCriarVertice(int chave) {
+        Elo atual = prim;
+        Elo anterior = null;
+        
+        while (atual != null) {
+            if (atual.chave == chave) {
+                return atual;
+            }
+            anterior = atual;
+            atual = atual.prox;
+        }
+        Elo novoVertice = new Elo(chave, 0);
+        
+        if (anterior == null) {
+            prim = novoVertice;
+        } else {
+            anterior.prox = novoVertice;
+        }
+        return novoVertice;
+    }
+
 	/* Método para impressão do estado atual da estrutura de dados. */
 	private void debug()
 	{
