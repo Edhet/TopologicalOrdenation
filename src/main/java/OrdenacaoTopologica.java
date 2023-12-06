@@ -85,19 +85,20 @@ public class OrdenacaoTopologica
             
             while ((linha = br.readLine()) != null) {
 
-                String[] tokens = linha.split(" ");
+                String[] tokens = linha.split(" < ");
                 
                 int x = Integer.parseInt(tokens[0]);
                 int y = Integer.parseInt(tokens[1]);
                 
                 Elo verticeX = encontrarOuCriarVertice(x);
                 Elo verticeY = encontrarOuCriarVertice(y);
-                
+
+                if (prim == null) prim = verticeY;
+
                 if (verticeX.listaSuc == null) {
                     verticeX.listaSuc = new EloSuc(verticeY, null);
                 } else {
-                    EloSuc novoEloSuc = new EloSuc(verticeY, verticeX.listaSuc);
-                    verticeX.listaSuc = novoEloSuc;
+                    verticeX.listaSuc = new EloSuc(verticeY, verticeX.listaSuc);
                 }
                 verticeY.contador++;
             }
@@ -126,6 +127,7 @@ public class OrdenacaoTopologica
         }
         return novoVertice;
     }
+
 	/* Método para impressão do estado atual da estrutura de dados. */
 	private void debug()
 	{
