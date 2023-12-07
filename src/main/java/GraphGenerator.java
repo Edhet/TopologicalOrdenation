@@ -20,7 +20,7 @@ public class GraphGenerator implements Runnable {
 
         System.out.println("[DEBUG]: Generated Graph {");
         for (var ptr = result; ptr != null; ptr = ptr.prox) {
-            System.out.print("Node: " + ptr.chave + " Predecessors: " + ptr.contador + " Sucessors: ");
+            System.out.print("Node: " + ptr.chave + " Predecessors: " + ptr.contador + " Successors: ");
             for (var sucPtr = ptr.listaSuc; sucPtr != null; sucPtr = sucPtr.prox) {
                 System.out.print(sucPtr.id.chave + (sucPtr.prox == null ? "" : ", "));
             }
