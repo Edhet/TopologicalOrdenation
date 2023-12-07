@@ -183,7 +183,7 @@ public class OrdenacaoTopologica
 		return list;
 	}
 
-	public void decreaseSucCont()
+	public void decreaseSucCount()
 	{
 		Elo p = prim;
 
@@ -230,7 +230,7 @@ public class OrdenacaoTopologica
 		n--;
 
 		list = eloSearch(fim, list);
-		decreaseSucCont();
+		decreaseSucCount();
 		fim = returnLastElo(list);
 
 		return topologicalSort(list, fim, n);
